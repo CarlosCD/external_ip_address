@@ -1,4 +1,4 @@
-#!/usr/bin/env -S ruby --enable=jit
+#!/usr/bin/env -S ruby
 
 # Get the external IP address (external to the WIFI router), and email it
 #   Pass -v to get some feedback when running it from the Terminal:
@@ -27,7 +27,7 @@ class SendExternalIpAddress
             puts "Today     (UTC): #{today}"
           end
         end
-        send_by_email(message:, pass: SENDGRID_KEY)
+        send_by_email(message: message, pass: SENDGRID_KEY)
         # It is just a new day, we won't change num_emails (only sending it once):
         if (new_address != old_address) || (num_emails < 10)
           puts("IP Addresses: '#{old_address || 'None'}' -> '#{new_address || 'None'}'") if @verbose && (new_address != old_address)
@@ -62,7 +62,6 @@ class SendExternalIpAddress
     IP_ECHO_SERVICES = %w( https://api.ipify.org/
                            https://icanhazip.com/
                            https://ident.me/
-                           https://ifconfig.me/ip/
                            https://ipecho.net/plain
                            http://whatismyip.akamai.com )
 
