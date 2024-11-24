@@ -1,4 +1,4 @@
-#!/usr/bin/env -S ruby
+#!/usr/bin/env ruby
 
 # Get the external IP address (external to the WIFI router), and email it
 #   Pass -v to get some feedback when running it from the Terminal:
@@ -81,6 +81,7 @@ class SendExternalIpAddress
 
     def get_ip_address_from_url(url)
       uri = URI(url)
+      puts("  URL: '#{url}'") if @verbose
       begin
         response = Net::HTTP.get_response(uri)
         body = response.is_a?(Net::HTTPSuccess) ? response.body : nil
