@@ -17,6 +17,9 @@ class SendExternalIpAddress
       num_emails ||= 0
       new_address, message = get_ip_address(number_urls: 3)
       message ||= "IP address is '#{new_address}'"
+      ruby_version = "#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}" rescue 'Nope'
+      rvm_current = `rvm current`.chomp rescue 'Nooo!'
+      message += " R:'#{ruby_version}', RVM:'#{rvm_current}'"
       if (new_address != old_address) || (today != date_last_sent) || (num_emails < 10)
         if @verbose
           puts 'Email sending conditions'
@@ -52,7 +55,13 @@ class SendExternalIpAddress
           puts "Installing the '#{gem_name}' Ruby gem..."
           system "gem install #{gem_name}"
         end
-        require gem_name
+        begin
+          require gem_name
+        rescue LoadError => e
+          puts("Error in 'require #{gem_name}: '#{e}'") if @verbose
+          log_a_temporary_error
+          exit(1)
+        end
       end
     end
 
@@ -133,6 +142,12 @@ class SendExternalIpAddress
       ip_address = ip_address.to_s
       num_emails = num_emails.to_i
       [ ip_address, num_emails, file_date ]
+    end
+
+    # Logging there was an error:
+    def log_a_temporary_error
+      ip_address, num_emails, date_last_sent = read_last_address(MEMORY_FILE)
+      save_last_address(MEMORY_FILE, ip_address, "#{num_emails}-Error!")
     end
 
     def save_last_address(filename, ip_address, num_emails)
