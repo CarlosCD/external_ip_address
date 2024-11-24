@@ -17,9 +17,13 @@ class SendExternalIpAddress
       num_emails ||= 0
       new_address, message = get_ip_address(number_urls: 3)
       message ||= "IP address is '#{new_address}'"
-      ruby_version = "#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}" rescue 'Nope'
-      rvm_current = `rvm current`.chomp rescue 'Nooo!'
-      message += " R:'#{ruby_version}', RVM:'#{rvm_current}'"
+      # Report in case RVM is not available, or errs:
+      begin
+        `rvm current`.chomp
+      rescue => e
+         message += "RVM problem! Ruby: " \
+                    "#{RUBY_VERSION}-p#{RUBY_PATCHLEVEL}, RVM error: #{e}"
+      end
       if (new_address != old_address) || (today != date_last_sent) || (num_emails < 10)
         if @verbose
           puts 'Email sending conditions'
